@@ -3,7 +3,7 @@ import { p, readLines } from "./util/util";
 const lines = readLines("input/a05.txt");
 
 const seatIds = lines.map(line => {
-  const binaryString = line.replaceAll(/[BR]/g, "1").replace(/[FL]/g, "0");
+  const binaryString = line.replace(/[BR]/g, "1").replace(/[FL]/g, "0");
   return parseInt(binaryString, 2);
 });
 
