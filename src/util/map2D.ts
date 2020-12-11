@@ -30,6 +30,12 @@ export class Map2DNode<T> implements Node {
   get4Neighbors() {
     return [this.getUp(), this.getRight(), this.getDown(), this.getLeft()];
   }
+
+  get8Neighbors() {
+    const up = this.getUp();
+    const down = this.getDown();
+    return [up.getLeft(), up, up.getRight(), this.getLeft(), this.getRight(), down.getLeft(), down, down.getRight()];
+  }
 }
 
 /**
