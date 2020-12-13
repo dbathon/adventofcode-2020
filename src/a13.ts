@@ -19,13 +19,13 @@ const idsAndOffsets = lines[1].split(",").map((id, offset) => [parseInt(id), off
 let searchStep = idsAndOffsets[0][0];
 let time = searchStep;
 for (let i = 1; i < idsAndOffsets.length; ++i) {
-  const idsAndOffsetsToCheck = idsAndOffsets.slice(0, i + 1);
-  // increase the time until it works for the first i ids
-  while (idsAndOffsetsToCheck.find(idAndOffset => (time + idAndOffset[1]) % idAndOffset[0] !== 0) !== undefined) {
+  const [id, offset] = idsAndOffsets[i];
+  // increase the time until it works for the ith id
+  while ((time + offset) % id !== 0) {
     time += searchStep;
   }
-  // now multiply the search step by the id at index i (all ids are prime)
-  searchStep *= idsAndOffsets[i][0];
+  // now multiply the search step by the ith id (all ids are prime)
+  searchStep *= id;
 }
 
 p(time);
