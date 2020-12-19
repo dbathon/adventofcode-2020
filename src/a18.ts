@@ -1,85 +1,61 @@
 import { p, readLines, sum } from "./util/util";
+import { Node, OneOrMore, parse, Rule } from "./util/parse";
 
 const lines = readLines("input/a18.txt");
 
-function getLeftAndRest(expression: string): string[] {
-  expression = expression.trim();
-  if (expression.startsWith("(")) {
-    let depth = 1;
-    let i = 1;
-    while (depth > 0) {
-      if (expression[i] == "(") {
-        ++depth;
-      }
-      else if (expression[i] == ")") {
-        --depth;
-      }
-      ++i;
-    }
-    return [expression.substring(1, i - 1), expression.substring(i)];
-  }
-  else {
-    const [_, left, rest] = /^(\d+)(.*)$/.exec(expression) || ["", "", ""];
-    return [left, rest];
-  }
-}
-
-class Node {
-  constructor(readonly left: Node | number, readonly op = "+", readonly right: Node | number = 0) { }
-
-  eval(): number {
-    const leftNum = typeof this.left === "number" ? this.left : this.left.eval();
-    const rightNum = typeof this.right === "number" ? this.right : this.right.eval();
-    if (this.op === "*") {
-      return leftNum * rightNum;
-    }
-    else if (this.op === "+") {
-      return leftNum + rightNum;
+function calculate(nodeChildren: (string | Node)[]): number {
+  if (nodeChildren.length === 1) {
+    const child = nodeChildren[0];
+    if (typeof child === "string") {
+      return parseInt(child);
     }
     else {
-      throw "unexpected op: " + this.op;
+      return calculate(child.children);
     }
   }
-}
-
-function parse(expression: string, lowerPrecendenceOp?: string): Node {
-  const parts: Node[] = [];
-  let current: Node | undefined = undefined;
-  let lastOp: string | undefined = undefined;
-  while (expression.length > 0) {
-    const [leftStr, rest] = getLeftAndRest(expression);
-    expression = rest.substring(3);
-    const left = /^(\d+)$/.exec(leftStr) !== null ? parseInt(leftStr) : parse(leftStr, lowerPrecendenceOp);
-    if (current === undefined) {
-      current = new Node(left);
-    }
-    else if (lastOp !== undefined) {
-      if (lowerPrecendenceOp === lastOp) {
-        parts.push(current);
-        current = new Node(left);
-      }
-      else {
-        current = new Node(current, lastOp, left);
-      }
-    }
-    else {
-      throw "error";
-    }
-
-    lastOp = rest[1];
+  if (nodeChildren[0] === "(") {
+    return calculate(nodeChildren.slice(1, -1));
   }
-  if (lowerPrecendenceOp === undefined) {
-    return current!;
+  const left = calculate(nodeChildren.slice(0, -2));
+  const operator = nodeChildren[nodeChildren.length - 2].toString().trim();
+  const right = calculate(nodeChildren.slice(-1));
+  if (operator === "*") {
+    return left * right;
+  }
+  else if (operator === "+") {
+    return left + right;
   }
   else {
-    if (current !== undefined) {
-      parts.push(current);
-    }
-
-    return parts.reduce((a, b) => new Node(a, lowerPrecendenceOp, b));
+    throw "unexpected op: " + operator;
   }
 }
 
-p(sum(lines.map(line => parse(line).eval())));
+const rules1 = new Map([
+  ["term", new Rule([
+    [/\d+/],
+    [/\(/, "expression", /\)/],
+  ])],
+  ["expression", new Rule([
+    ["term"],
+    ["term", new OneOrMore([/ *(\*|\+) */, "term"])],
+  ])]
+]);
 
-p(sum(lines.map(line => parse(line, "*").eval())));
+p(sum(lines.map(line => calculate(parse(line, rules1, "expression")!.children))));
+
+const rules2 = new Map([
+  ["term", new Rule([
+    [/\d+/],
+    [/\(/, "expression", /\)/],
+  ])],
+  ["sum", new Rule([
+    ["term"],
+    ["term", / *\+ */, "sum"],
+  ])],
+  ["expression", new Rule([
+    ["sum"],
+    ["sum", / *\* */, "expression"],
+  ])]
+]);
+
+p(sum(lines.map(line => calculate(parse(line, rules2, "expression")!.children))));
