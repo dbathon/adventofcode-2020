@@ -39,6 +39,16 @@ export function findMax<T>(list: T[], toNumber: (t: T) => number): { max: number
   return { max, maxElement };
 }
 
+export function intersection<T>(setA: Set<T>, setB: Set<T>): Set<T> {
+  let intersection: Set<T> = new Set();
+  for (let elem of setB) {
+    if (setA.has(elem)) {
+      intersection.add(elem);
+    }
+  }
+  return intersection;
+}
+
 export class Heap<T> {
   private data: T[] = [];
   constructor(readonly isABeforeB: (a: T, b: T) => boolean) { }

@@ -1,16 +1,6 @@
-import { p, readLines } from "./util/util";
+import { p, readLines, intersection } from "./util/util";
 
 const lines = readLines("input/a06.txt", true, false);
-
-function intersection<T>(setA: Set<T>, setB: Set<T>): Set<T> {
-  let intersection: Set<T> = new Set();
-  for (let elem of setB) {
-    if (setA.has(elem)) {
-      intersection.add(elem);
-    }
-  }
-  return intersection;
-}
 
 const currentLetters: Set<string> = new Set();
 let currentLettersAll: Set<string> | undefined = undefined;
