@@ -127,6 +127,8 @@ for (let i = 0; i < edgeLength * 10; ++i) {
       node.get4Neighbors().forEach(neighbor => {
         if (neighbor.value !== undefined) {
           node.value = intersection(intersection(value, getPotentialNeighbors([...neighbor.value])), unusedIds);
+          const neighborCount = node.get4Neighbors().filter(neighbor => neighbor.value !== undefined).length;
+          node.value = new Set([...node.value].filter(id => idToNeighbors.get(id)!.length === neighborCount));
         }
       });
     }
@@ -159,8 +161,8 @@ map.forEachNode(node => {
           variants.push(tile);
         }
       });
-      if (variants.length > 1) {
-        throw "too many variants";
+      if (variants.length !== 1) {
+        throw "no unique variant: " + variants;
       }
       current.tile = variants[0];
     }
@@ -171,23 +173,26 @@ map.forEachNode(node => {
           variants.push(tile);
         }
       });
-      if (variants.length > 1) {
-        throw "too many variants";
+      if (variants.length !== 1) {
+        throw "no unique variant: " + variants;
       }
       current.tile = variants[0];
     }
     else {
+      // top left node, init it and its right and down neighbors
       const right = node.getRight().value!;
-      // top left node, init it and its right neighbor
+      const down = node.getDown().value!;
 
-      const possibleEdges = intersection(new Set(edges(tiles.get(current.id)!)), new Set(edges(tiles.get(right.id)!)));
-      // choose one edge
-      const edge = [...possibleEdges][0];
       allVariants(tiles.get(current.id)!).forEach(tile1 => {
         allVariants(tiles.get(right.id)!).forEach(tile2 => {
           if (rightEdge(tile1) === leftEdge(tile2)) {
-            current.tile = tile1;
-            right.tile = tile2;
+            allVariants(tiles.get(down.id)!).forEach(tile3 => {
+              if (bottomEdge(tile1) === topEdge(tile3)) {
+                current.tile = tile1;
+                right.tile = tile2;
+                down.tile = tile3;
+              }
+            });
           }
         });
       });
