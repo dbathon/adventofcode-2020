@@ -6,14 +6,12 @@ const start = lines[0].split("").map(number => parseInt(number));
 
 class State {
   next: number[] = [];
-  prev: number[] = [];
   readonly min: number;
   readonly max: number;
 
   constructor(public current: number, startState: number[]) {
     startState.forEach((element, index) => {
       this.next[element] = startState[(index + 1) % startState.length];
-      this.prev[element] = startState[(index + startState.length - 1) % startState.length];
     });
     this.min = startState.reduce((prev, cur) => Math.min(prev, cur));
     this.max = startState.reduce((prev, cur) => Math.max(prev, cur));
@@ -24,10 +22,8 @@ class State {
     const pickUpMiddle = this.next[pickUpStart];
     const pickUpEnd = this.next[pickUpMiddle];
 
-    // remove pickup from maps
-    const afterPickup = this.next[pickUpEnd];
-    this.next[this.current] = afterPickup;
-    this.prev[afterPickup] = this.current;
+    // remove pickup from the "ring"
+    this.next[this.current] = this.next[pickUpEnd];
 
     let destination = this.current;
     do {
@@ -38,12 +34,9 @@ class State {
     }
     while (destination === pickUpStart || destination === pickUpMiddle || destination === pickUpEnd);
 
-    // "insert" pickup again
-    const afterDestination = this.next[destination];
-    this.next[pickUpEnd] = afterDestination;
-    this.prev[afterDestination] = pickUpEnd;
+    // insert pickup again
+    this.next[pickUpEnd] = this.next[destination];
     this.next[destination] = pickUpStart;
-    this.prev[pickUpStart] = destination;
 
     this.current = this.next[this.current];
   }
