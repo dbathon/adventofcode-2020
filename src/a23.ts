@@ -5,29 +5,29 @@ const lines = readLines("input/a23.txt");
 const start = lines[0].split("").map(number => parseInt(number));
 
 class State {
-  next = new Map<number, number>();
-  prev = new Map<number, number>();
+  next: number[] = [];
+  prev: number[] = [];
   readonly min: number;
   readonly max: number;
 
   constructor(public current: number, startState: number[]) {
     startState.forEach((element, index) => {
-      this.next.set(element, startState[(index + 1) % startState.length]);
-      this.prev.set(element, startState[(index + startState.length - 1) % startState.length]);
+      this.next[element] = startState[(index + 1) % startState.length];
+      this.prev[element] = startState[(index + startState.length - 1) % startState.length];
     });
     this.min = startState.reduce((prev, cur) => Math.min(prev, cur));
     this.max = startState.reduce((prev, cur) => Math.max(prev, cur));
   }
 
   step() {
-    const pickUpStart = this.next.get(this.current)!;
-    const pickUpMiddle = this.next.get(pickUpStart)!;
-    const pickUpEnd = this.next.get(pickUpMiddle)!;
+    const pickUpStart = this.next[this.current];
+    const pickUpMiddle = this.next[pickUpStart];
+    const pickUpEnd = this.next[pickUpMiddle];
 
     // remove pickup from maps
-    const afterPickup = this.next.get(pickUpEnd)!;
-    this.next.set(this.current, afterPickup);
-    this.prev.set(afterPickup, this.current);
+    const afterPickup = this.next[pickUpEnd];
+    this.next[this.current] = afterPickup;
+    this.prev[afterPickup] = this.current;
 
     let destination = this.current;
     do {
@@ -39,19 +39,19 @@ class State {
     while (destination === pickUpStart || destination === pickUpMiddle || destination === pickUpEnd);
 
     // "insert" pickup again
-    const afterDestination = this.next.get(destination)!;
-    this.next.set(pickUpEnd, afterDestination);
-    this.prev.set(afterDestination, pickUpEnd);
-    this.next.set(destination, pickUpStart);
-    this.prev.set(pickUpStart, destination);
+    const afterDestination = this.next[destination];
+    this.next[pickUpEnd] = afterDestination;
+    this.prev[afterDestination] = pickUpEnd;
+    this.next[destination] = pickUpStart;
+    this.prev[pickUpStart] = destination;
 
-    this.current = this.next.get(this.current)!;
+    this.current = this.next[this.current];
   }
 
   getAfter(element: number, count: number): number[] {
     const result: number[] = [];
     while (count > 0) {
-      element = this.next.get(element)!;
+      element = this.next[element];
       result.push(element);
       --count;
     }
