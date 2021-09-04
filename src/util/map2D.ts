@@ -1,7 +1,7 @@
 import { Node } from "./graphUtil";
 
 export class Map2DNode<T> implements Node {
-  constructor(readonly map: Map2D<T>, readonly x: number, readonly y: number) { }
+  constructor(readonly map: Map2D<T>, readonly x: number, readonly y: number) {}
 
   get value(): T | undefined {
     return this.map.get(this.x, this.y);
@@ -92,7 +92,7 @@ export class Map2D<T> {
 
       return this.getIndex(x, y);
     }
-    return (yIndex * this._width) + xIndex;
+    return yIndex * this._width + xIndex;
   }
 
   get(x: number, y: number): T | undefined {
@@ -146,8 +146,14 @@ export class Map2D<T> {
    * This only works if all the elements are single character strings.
    */
   draw(): string {
-    return this.getAsArray().map(row => row.map(element => {
-      return element === undefined ? " " : element;
-    }).join("")).join("\n");
+    return this.getAsArray()
+      .map((row) =>
+        row
+          .map((element) => {
+            return element === undefined ? " " : element;
+          })
+          .join("")
+      )
+      .join("\n");
   }
 }

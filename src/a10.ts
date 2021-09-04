@@ -1,6 +1,6 @@
 import { p, readLines } from "./util/util";
 
-const ratings = readLines("input/a10.txt").map(line => parseInt(line));
+const ratings = readLines("input/a10.txt").map((line) => parseInt(line));
 
 ratings.push(0);
 ratings.sort((a, b) => a - b);

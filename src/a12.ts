@@ -2,12 +2,17 @@ import { p, readLines } from "./util/util";
 
 const lines = readLines("input/a12.txt");
 
-const DEG_TO_DIR = new Map([[0, "N"], [90, "E"], [180, "S"], [270, "W"]]);
+const DEG_TO_DIR = new Map([
+  [0, "N"],
+  [90, "E"],
+  [180, "S"],
+  [270, "W"],
+]);
 
 const state = {
   direction: 90,
   x: 0,
-  y: 0
+  y: 0,
 };
 
 function mod(n: number, m: number) {
@@ -52,12 +57,11 @@ lines.forEach(apply);
 
 p(Math.abs(state.x) + Math.abs(state.y));
 
-
 const state2 = {
   x: 0,
   y: 0,
   waypointX: 10,
-  waypointY: -1
+  waypointY: -1,
 };
 
 function apply2(instruction: string) {

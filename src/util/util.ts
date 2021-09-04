@@ -2,7 +2,10 @@ import { readFileSync } from "fs";
 
 export function readLines(path: string, trim = true, omitEmpty = true) {
   const input = readFileSync(path).toString();
-  return input.split("\n").map(line => trim ? line.trim() : line).filter(line => !omitEmpty || line.length > 0);
+  return input
+    .split("\n")
+    .map((line) => (trim ? line.trim() : line))
+    .filter((line) => !omitEmpty || line.length > 0);
 }
 
 export function sum(numbers: number[]) {
@@ -10,12 +13,11 @@ export function sum(numbers: number[]) {
 }
 
 export function p(input: any) {
-  console.log(typeof input === "string"
-    ? input
-    : JSON.stringify(input, (key, value) =>
-      typeof value === "bigint"
-        ? value.toString()
-        : value));
+  console.log(
+    typeof input === "string"
+      ? input
+      : JSON.stringify(input, (key, value) => (typeof value === "bigint" ? value.toString() : value))
+  );
 }
 
 export function splitArray<T>(array: T[], splitLength: number): T[][] {
@@ -26,10 +28,13 @@ export function splitArray<T>(array: T[], splitLength: number): T[][] {
   return result;
 }
 
-export function findMax<T>(list: T[], toNumber: (t: T) => number): { max: number | undefined; maxElement: T | undefined; } {
+export function findMax<T>(
+  list: T[],
+  toNumber: (t: T) => number
+): { max: number | undefined; maxElement: T | undefined } {
   let max: number | undefined = undefined;
   let maxElement: T | undefined = undefined;
-  list.forEach(element => {
+  list.forEach((element) => {
     const value = toNumber(element);
     if (typeof max === "undefined" || value > max) {
       max = value;
@@ -51,7 +56,7 @@ export function intersection<T>(setA: Set<T>, setB: Set<T>): Set<T> {
 
 export class Heap<T> {
   private data: T[] = [];
-  constructor(readonly isABeforeB: (a: T, b: T) => boolean) { }
+  constructor(readonly isABeforeB: (a: T, b: T) => boolean) {}
 
   private child1Index(index: number) {
     return 2 * index + 1;
@@ -84,8 +89,7 @@ export class Heap<T> {
       if (this.isABeforeB(this.data[parent], this.data[index])) {
         // done
         return;
-      }
-      else {
+      } else {
         this.swap(index, parent);
       }
 
@@ -101,8 +105,7 @@ export class Heap<T> {
 
     if (this.size === 1) {
       this.data.pop();
-    }
-    else {
+    } else {
       let index = 0;
       this.data[index] = this.data.pop()!;
       const newSize = this.size;
@@ -115,8 +118,7 @@ export class Heap<T> {
         let child: number;
         if (child2 >= newSize) {
           child = child1;
-        }
-        else {
+        } else {
           child = this.isABeforeB(this.data[child1], this.data[child2]) ? child1 : child2;
         }
         if (this.isABeforeB(this.data[index], this.data[child])) {

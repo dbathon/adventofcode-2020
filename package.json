@@ -31,7 +31,8 @@
     "a24": "node -r esbuild-register src/a24.ts",
     "a25": "node -r esbuild-register src/a25.ts",
     "all": "node -r esbuild-register src/runAll.ts",
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "prettier": "prettier --write ."
   },
   "dependencies": {
     "@types/node": "^16.7.10"
@@ -39,6 +40,7 @@
   "devDependencies": {
     "esbuild": "^0.12.25",
     "esbuild-register": "^3.0.0",
+    "prettier": "^2.3.2",
     "typescript": "^4.4.2"
   }
 }

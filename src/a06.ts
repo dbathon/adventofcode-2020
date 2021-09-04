@@ -7,24 +7,22 @@ let currentLettersAll: Set<string> | undefined = undefined;
 let sum1 = 0;
 let sum2 = 0;
 
-lines.forEach(line => {
+lines.forEach((line) => {
   if (line === "" && currentLettersAll != undefined) {
     sum1 += currentLetters.size;
     sum2 += currentLettersAll.size;
     currentLetters.clear();
     currentLettersAll = undefined;
-  }
-  else {
+  } else {
     const personLetters: Set<string> = new Set();
-    line.split("").forEach(letter => {
+    line.split("").forEach((letter) => {
       currentLetters.add(letter);
       personLetters.add(letter);
     });
 
     if (currentLettersAll === undefined) {
       currentLettersAll = personLetters;
-    }
-    else {
+    } else {
       currentLettersAll = intersection(currentLettersAll, personLetters);
     }
   }

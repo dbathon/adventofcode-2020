@@ -1,9 +1,8 @@
-
 export class Node {
-  constructor(readonly ruleName: string, readonly children: (string | Node)[]) { }
+  constructor(readonly ruleName: string, readonly children: (string | Node)[]) {}
 
   toString(): string {
-    return this.children.map(child => child.toString()).join("");
+    return this.children.map((child) => child.toString()).join("");
   }
 }
 
@@ -17,19 +16,22 @@ export class OneOrMore {
 
 export class Rule {
   constructor(readonly patterns: (string | RegExp | OneOrMore)[][]) {
-    if (patterns.find(pattern => pattern.length === 0) !== undefined) {
+    if (patterns.find((pattern) => pattern.length === 0) !== undefined) {
       throw new Error("patterns need at least one step");
     }
   }
 }
 
 class PartialResult {
-  constructor(readonly nodes: (Node | string)[], readonly remaining: string) { }
+  constructor(readonly nodes: (Node | string)[], readonly remaining: string) {}
 }
 
 class Possibility {
-  constructor(readonly remaining: string,
-    readonly children: (string | Node)[], readonly remainingPattern: (string | RegExp | OneOrMore)[]) { }
+  constructor(
+    readonly remaining: string,
+    readonly children: (string | Node)[],
+    readonly remainingPattern: (string | RegExp | OneOrMore)[]
+  ) {}
 }
 
 function getRule(rules: Map<string, Rule>, ruleName: string) {
@@ -40,55 +42,66 @@ function getRule(rules: Map<string, Rule>, ruleName: string) {
   return rule;
 }
 
-function parseRecursive(string: string, rules: Map<string, Rule>, patternPart: string | RegExp | OneOrMore): PartialResult[] {
+function parseRecursive(
+  string: string,
+  rules: Map<string, Rule>,
+  patternPart: string | RegExp | OneOrMore
+): PartialResult[] {
   const result: PartialResult[] = [];
   if (typeof patternPart === "string") {
     const ruleName = patternPart;
     const rule = getRule(rules, ruleName);
 
-    const possibilities = rule.patterns.map(pattern => new Possibility(string, [], pattern));
+    const possibilities = rule.patterns.map((pattern) => new Possibility(string, [], pattern));
 
     while (possibilities.length > 0) {
       const possibility = possibilities.shift()!;
       const newRemainingPattern = possibility.remainingPattern.slice(1);
       const step = possibility.remainingPattern[0];
       for (const partialResult of parseRecursive(possibility.remaining, rules, step)) {
-        const newPossibility = new Possibility(partialResult.remaining, [...possibility.children, ...partialResult.nodes], newRemainingPattern);
+        const newPossibility = new Possibility(
+          partialResult.remaining,
+          [...possibility.children, ...partialResult.nodes],
+          newRemainingPattern
+        );
         if (newPossibility.remainingPattern.length === 0) {
-          const partialResult = new PartialResult([new Node(ruleName, newPossibility.children)], newPossibility.remaining);
+          const partialResult = new PartialResult(
+            [new Node(ruleName, newPossibility.children)],
+            newPossibility.remaining
+          );
           if (partialResult.remaining.length === 0) {
             // we found a full match, just return it
             return [partialResult];
           }
           result.push(partialResult);
-        }
-        else {
+        } else {
           possibilities.push(newPossibility);
         }
       }
     }
-  }
-  else if (patternPart instanceof OneOrMore) {
+  } else if (patternPart instanceof OneOrMore) {
     const oneOrMore = patternPart;
     const possibilities = [new Possibility(string, [], oneOrMore.pattern)];
     while (possibilities.length > 0) {
       const possibility = possibilities.shift()!;
       const newRemainingPattern = possibility.remainingPattern.slice(1);
       const step = possibility.remainingPattern[0];
-      parseRecursive(possibility.remaining, rules, step).forEach(partialResult => {
-        const newPossibility = new Possibility(partialResult.remaining, [...possibility.children, ...partialResult.nodes], newRemainingPattern);
+      parseRecursive(possibility.remaining, rules, step).forEach((partialResult) => {
+        const newPossibility = new Possibility(
+          partialResult.remaining,
+          [...possibility.children, ...partialResult.nodes],
+          newRemainingPattern
+        );
         if (newPossibility.remainingPattern.length === 0) {
           result.push(new PartialResult(newPossibility.children, newPossibility.remaining));
           // and also try matching the pattern again
           possibilities.push(new Possibility(newPossibility.remaining, newPossibility.children, oneOrMore.pattern));
-        }
-        else {
+        } else {
           possibilities.push(newPossibility);
         }
       });
     }
-  }
-  else {
+  } else {
     const regExp = patternPart;
     regExp.lastIndex = 0;
     const match = regExp.exec(string);
@@ -99,30 +112,36 @@ function parseRecursive(string: string, rules: Map<string, Rule>, patternPart: s
   return result;
 }
 
-function isLeftRecursive(startRuleName: string, checkRule: Rule, rules: Map<string, Rule>, checked = new Set<string>()): boolean {
-  return checkRule.patterns.find(pattern => {
-    let firstStep = pattern[0];
-    if (firstStep instanceof OneOrMore) {
-      firstStep = firstStep.pattern[0];
-    }
-    if (typeof firstStep === "string") {
-      if (firstStep === startRuleName) {
-        return true;
+function isLeftRecursive(
+  startRuleName: string,
+  checkRule: Rule,
+  rules: Map<string, Rule>,
+  checked = new Set<string>()
+): boolean {
+  return (
+    checkRule.patterns.find((pattern) => {
+      let firstStep = pattern[0];
+      if (firstStep instanceof OneOrMore) {
+        firstStep = firstStep.pattern[0];
       }
-      if (!checked.has(firstStep)) {
-        checked.add(firstStep);
-        try {
-          if (isLeftRecursive(startRuleName, getRule(rules, firstStep), rules, checked)) {
-            return true;
+      if (typeof firstStep === "string") {
+        if (firstStep === startRuleName) {
+          return true;
+        }
+        if (!checked.has(firstStep)) {
+          checked.add(firstStep);
+          try {
+            if (isLeftRecursive(startRuleName, getRule(rules, firstStep), rules, checked)) {
+              return true;
+            }
+          } finally {
+            checked.delete(firstStep);
           }
         }
-        finally {
-          checked.delete(firstStep);
-        }
       }
-    }
-    return false;
-  }) !== undefined;
+      return false;
+    }) !== undefined
+  );
 }
 
 /**
@@ -139,6 +158,8 @@ export function parse(string: string, rules: Map<string, Rule>, startRuleName: s
       throw new Error("left recursive rules are not supported: " + name);
     }
   });
-  const result = parseRecursive(string, rules, startRuleName).find(partialResult => partialResult.remaining.length === 0);
+  const result = parseRecursive(string, rules, startRuleName).find(
+    (partialResult) => partialResult.remaining.length === 0
+  );
   return result && !(typeof result.nodes[0] === "string") ? result.nodes[0] : undefined;
 }

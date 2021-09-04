@@ -1,6 +1,6 @@
 import { p, readLines } from "./util/util";
 
-const numbers = readLines("input/a01.txt").map(str => parseInt(str));
+const numbers = readLines("input/a01.txt").map((str) => parseInt(str));
 
 for (let i = 0; i < numbers.length; ++i) {
   const n1 = numbers[i];
@@ -11,7 +11,6 @@ for (let i = 0; i < numbers.length; ++i) {
     }
   }
 }
-
 
 for (let i = 0; i < numbers.length; ++i) {
   const n1 = numbers[i];

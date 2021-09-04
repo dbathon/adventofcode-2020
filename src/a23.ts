@@ -2,7 +2,7 @@ import { p, readLines } from "./util/util";
 
 const lines = readLines("input/a23.txt");
 
-const start = lines[0].split("").map(number => parseInt(number));
+const start = lines[0].split("").map((number) => parseInt(number));
 
 class State {
   next: number[] = [];
@@ -31,8 +31,7 @@ class State {
       if (destination < this.min) {
         destination = this.max;
       }
-    }
-    while (destination === pickUpStart || destination === pickUpMiddle || destination === pickUpEnd);
+    } while (destination === pickUpStart || destination === pickUpMiddle || destination === pickUpEnd);
 
     // insert pickup again
     this.next[pickUpEnd] = this.next[destination];

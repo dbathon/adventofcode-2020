@@ -14,17 +14,20 @@ function load() {
 }
 load();
 
-function performStep(map: Map2D<string>, getOccupiedNeighbors: (map: Map2DNode<string>) => number, minOccupied = 4): boolean {
+function performStep(
+  map: Map2D<string>,
+  getOccupiedNeighbors: (map: Map2DNode<string>) => number,
+  minOccupied = 4
+): boolean {
   let changes = false;
   const newMap: Map2D<string> = new Map2D();
 
-  map.forEachNode(node => {
+  map.forEachNode((node) => {
     let newValue = node.value;
     if (node.value === "L" && getOccupiedNeighbors(node) === 0) {
       newValue = "#";
       changes = true;
-    }
-    else if (node.value === "#" && getOccupiedNeighbors(node) >= minOccupied) {
+    } else if (node.value === "#" && getOccupiedNeighbors(node) >= minOccupied) {
       newValue = "L";
       changes = true;
     }
@@ -32,7 +35,7 @@ function performStep(map: Map2D<string>, getOccupiedNeighbors: (map: Map2DNode<s
   });
 
   if (changes) {
-    map.forEachNode(node => {
+    map.forEachNode((node) => {
       node.value = newMap.get(node.x, node.y);
     });
   }
@@ -40,11 +43,11 @@ function performStep(map: Map2D<string>, getOccupiedNeighbors: (map: Map2DNode<s
   return changes;
 }
 
-while (performStep(map, node => node.get8Neighbors().filter(node => node.value === "#").length));
+while (performStep(map, (node) => node.get8Neighbors().filter((node) => node.value === "#").length));
 
 function countOccupied(map: Map2D<string>): number {
   let occupied = 0;
-  map.forEachNode(node => {
+  map.forEachNode((node) => {
     if (node.value === "#") {
       ++occupied;
     }
@@ -58,14 +61,14 @@ p(countOccupied(map));
 load();
 
 const NEIGHBOR_STEPS: ((node: Map2DNode<string>) => Map2DNode<string>)[] = [
-  node => node.getUp().getLeft(),
-  node => node.getUp(),
-  node => node.getUp().getRight(),
-  node => node.getLeft(),
-  node => node.getRight(),
-  node => node.getDown().getLeft(),
-  node => node.getDown(),
-  node => node.getDown().getRight(),
+  (node) => node.getUp().getLeft(),
+  (node) => node.getUp(),
+  (node) => node.getUp().getRight(),
+  (node) => node.getLeft(),
+  (node) => node.getRight(),
+  (node) => node.getDown().getLeft(),
+  (node) => node.getDown(),
+  (node) => node.getDown().getRight(),
 ];
 
 function getVisibleOccupiedNeighbors(node: Map2DNode<string>): number {
@@ -82,7 +85,7 @@ function getVisibleOccupiedNeighbors(node: Map2DNode<string>): number {
     }
   }
 
-  return NEIGHBOR_STEPS.filter(step => visibleOccupied(node, step)).length;
+  return NEIGHBOR_STEPS.filter((step) => visibleOccupied(node, step)).length;
 }
 
 while (performStep(map, getVisibleOccupiedNeighbors, 5));

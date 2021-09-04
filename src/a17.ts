@@ -27,30 +27,36 @@ function runIterations(map: Map2D<string>, n: number, fourD: boolean): Map2D<Map
         for (let x = map.originX - extra; x <= map.originX + map.width + extra; ++x) {
           for (let y = map.originY - extra; y <= map.originY + map.height + extra; ++y) {
             let activeNeighborCount = 0;
-            planeNode.value.getNode(x, y).get8Neighbors().forEach(node => {
-              if (node.value === "#") {
-                ++activeNeighborCount;
-              }
-            });
-            planeNode.get8Neighbors()
-              .filter(node => node !== undefined)
-              .map(node => node.value)
-              .filter(plane => plane !== undefined)
-              .forEach(otherPlane => {
+            planeNode.value
+              .getNode(x, y)
+              .get8Neighbors()
+              .forEach((node) => {
+                if (node.value === "#") {
+                  ++activeNeighborCount;
+                }
+              });
+            planeNode
+              .get8Neighbors()
+              .filter((node) => node !== undefined)
+              .map((node) => node.value)
+              .filter((plane) => plane !== undefined)
+              .forEach((otherPlane) => {
                 if (otherPlane!.get(x, y) === "#") {
                   ++activeNeighborCount;
                 }
-                otherPlane!.getNode(x, y).get8Neighbors().forEach(node => {
-                  if (node.value === "#") {
-                    ++activeNeighborCount;
-                  }
-                });
+                otherPlane!
+                  .getNode(x, y)
+                  .get8Neighbors()
+                  .forEach((node) => {
+                    if (node.value === "#") {
+                      ++activeNeighborCount;
+                    }
+                  });
               });
             let newState = planeNode.value.get(x, y);
             if (newState === "#" && activeNeighborCount !== 2 && activeNeighborCount !== 3) {
               newState = undefined;
-            }
-            else if (newState === undefined && activeNeighborCount === 3) {
+            } else if (newState === undefined && activeNeighborCount === 3) {
               newState = "#";
             }
 
@@ -67,11 +73,11 @@ function runIterations(map: Map2D<string>, n: number, fourD: boolean): Map2D<Map
   return space;
 }
 
-[false, true].forEach(fourD => {
+[false, true].forEach((fourD) => {
   let activeCount = 0;
-  runIterations(initialMap, 6, fourD).forEachNode(node1 => {
+  runIterations(initialMap, 6, fourD).forEachNode((node1) => {
     if (node1.value) {
-      node1.value.forEachNode(node2 => {
+      node1.value.forEachNode((node2) => {
         if (node2.value === "#") {
           ++activeCount;
         }

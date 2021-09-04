@@ -8,8 +8,7 @@ function calculate(nodeChildren: (string | Node)[]): number {
     const child = nodeChildren[0];
     if (typeof child === "string") {
       return parseInt(child);
-    }
-    else {
+    } else {
       return calculate(child.children);
     }
   }
@@ -21,41 +20,24 @@ function calculate(nodeChildren: (string | Node)[]): number {
   const right = calculate(nodeChildren.slice(-1));
   if (operator === "*") {
     return left * right;
-  }
-  else if (operator === "+") {
+  } else if (operator === "+") {
     return left + right;
-  }
-  else {
+  } else {
     throw "unexpected op: " + operator;
   }
 }
 
 const rules1 = new Map([
-  ["term", new Rule([
-    [/\d+/],
-    [/\(/, "expression", /\)/],
-  ])],
-  ["expression", new Rule([
-    ["term"],
-    ["term", new OneOrMore([/ *(\*|\+) */, "term"])],
-  ])]
+  ["term", new Rule([[/\d+/], [/\(/, "expression", /\)/]])],
+  ["expression", new Rule([["term"], ["term", new OneOrMore([/ *(\*|\+) */, "term"])]])],
 ]);
 
-p(sum(lines.map(line => calculate(parse(line, rules1, "expression")!.children))));
+p(sum(lines.map((line) => calculate(parse(line, rules1, "expression")!.children))));
 
 const rules2 = new Map([
-  ["term", new Rule([
-    [/\d+/],
-    [/\(/, "expression", /\)/],
-  ])],
-  ["sum", new Rule([
-    ["term"],
-    ["term", / *\+ */, "sum"],
-  ])],
-  ["expression", new Rule([
-    ["sum"],
-    ["sum", / *\* */, "expression"],
-  ])]
+  ["term", new Rule([[/\d+/], [/\(/, "expression", /\)/]])],
+  ["sum", new Rule([["term"], ["term", / *\+ */, "sum"]])],
+  ["expression", new Rule([["sum"], ["sum", / *\* */, "expression"]])],
 ]);
 
-p(sum(lines.map(line => calculate(parse(line, rules2, "expression")!.children))));
+p(sum(lines.map((line) => calculate(parse(line, rules2, "expression")!.children))));

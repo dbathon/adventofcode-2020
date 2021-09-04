@@ -2,7 +2,7 @@ import { p, readLines } from "./util/util";
 
 const lines = readLines("input/a15.txt");
 
-const numbers = lines[0].split(",").map(num => parseInt(num));
+const numbers = lines[0].split(",").map((num) => parseInt(num));
 
 let next = numbers.pop()!;
 let nextIndex = numbers.length;
@@ -17,8 +17,7 @@ while (nextIndex < 30000000) {
   }
   if (lastIndex === undefined) {
     next = 0;
-  }
-  else {
+  } else {
     next = nextIndex - lastIndex;
   }
   ++nextIndex;

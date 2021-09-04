@@ -21,7 +21,7 @@ function findLoopSize(subjectNumber: number, publicKey: number): number {
   }
 }
 
-const publicKeys = lines.map(line => parseInt(line));
-const loopSizes = publicKeys.map(publicKey => findLoopSize(7, publicKey));
+const publicKeys = lines.map((line) => parseInt(line));
+const loopSizes = publicKeys.map((publicKey) => findLoopSize(7, publicKey));
 
 p(transform(1, publicKeys[0], loopSizes[1]));

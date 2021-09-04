@@ -13,8 +13,7 @@ function applyMask(value: number, mask: string): number {
     const bitSet = isBitSet(value, bit);
     if (mask[i] === "1" && !bitSet) {
       value += bit;
-    }
-    else if (mask[i] === "0" && bitSet) {
+    } else if (mask[i] === "0" && bitSet) {
       value -= bit;
     }
     bit *= 2;
@@ -28,21 +27,19 @@ function generateAddresses(address: number, mask: string): number[] {
   for (let i = mask.length - 1; i >= 0; --i) {
     if (mask[i] === "1" && !isBitSet(address, bit)) {
       address += bit;
-    }
-    else if (mask[i] === "X") {
+    } else if (mask[i] === "X") {
       floatingBits.push(bit);
     }
     bit *= 2;
   }
   let result = [address];
-  floatingBits.forEach(floatingBit => {
+  floatingBits.forEach((floatingBit) => {
     const newResult: number[] = [];
-    result.forEach(entry => {
+    result.forEach((entry) => {
       if (isBitSet(entry, floatingBit)) {
         newResult.push(entry - floatingBit);
         newResult.push(entry);
-      }
-      else {
+      } else {
         newResult.push(entry);
         newResult.push(entry + floatingBit);
       }
@@ -57,21 +54,19 @@ const mem: number[] = [];
 const mem2: Map<number, number> = new Map();
 let mask = "";
 
-lines.forEach(line => {
+lines.forEach((line) => {
   if (line.startsWith("mask = ")) {
     mask = line.substr(7);
-  }
-  else {
+  } else {
     const match = /^mem\[(\d+)] = (\d+)$/.exec(line);
     if (match !== null) {
       const address = parseInt(match[1]);
       const value = parseInt(match[2]);
       mem[address] = applyMask(value, mask);
-      generateAddresses(address, mask).forEach(genAddress => {
+      generateAddresses(address, mask).forEach((genAddress) => {
         mem2.set(genAddress, value);
       });
-    }
-    else {
+    } else {
       throw "unexpected: " + line;
     }
   }
@@ -79,4 +74,4 @@ lines.forEach(line => {
 
 p(sum(mem));
 
-p(sum([...mem2].map(entry => entry[1])));
+p(sum([...mem2].map((entry) => entry[1])));

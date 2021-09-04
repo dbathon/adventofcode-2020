@@ -2,13 +2,17 @@ import { p, readLines, sum } from "./util/util";
 
 const lines = readLines("input/a22.txt");
 
-const [deck1, deck2] = lines.slice(1).join(",").split(/,Player \d+:,/).map(deck => deck.split(",").map(card => parseInt(card)));
+const [deck1, deck2] = lines
+  .slice(1)
+  .join(",")
+  .split(/,Player \d+:,/)
+  .map((deck) => deck.split(",").map((card) => parseInt(card)));
 
 function score(winDeck: number[]): number {
   return sum(winDeck.map((card, index) => card * (winDeck.length - index)));
 }
 
-function play(deck1: number[], deck2: number[], recursive: boolean): { score: number, player1Wins: boolean; } {
+function play(deck1: number[], deck2: number[], recursive: boolean): { score: number; player1Wins: boolean } {
   const seenStates = new Set<string>();
   while (deck1.length > 0 && deck2.length > 0) {
     if (recursive) {
@@ -27,8 +31,7 @@ function play(deck1: number[], deck2: number[], recursive: boolean): { score: nu
     }
     if (player1Wins) {
       deck1.push(card1, card2);
-    }
-    else {
+    } else {
       deck2.push(card2, card1);
     }
   }

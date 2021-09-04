@@ -5,17 +5,21 @@ const lines = readLines("input/a20.txt");
 
 const tiles: Map<number, string[]> = new Map();
 
-lines.join("\n").replace(/^Tile /, "").split(/\nTile /).forEach(tile => {
-  const [id, tileLines] = tile.split(":\n");
-  tiles.set(parseInt(id), tileLines.split("\n"));
-});
+lines
+  .join("\n")
+  .replace(/^Tile /, "")
+  .split(/\nTile /)
+  .forEach((tile) => {
+    const [id, tileLines] = tile.split(":\n");
+    tiles.set(parseInt(id), tileLines.split("\n"));
+  });
 
 function rightEdge(tileLines: string[]) {
-  return tileLines.map(line => line[line.length - 1]).join("");
+  return tileLines.map((line) => line[line.length - 1]).join("");
 }
 
 function leftEdge(tileLines: string[]) {
-  return tileLines.map(line => line[0]).join("");
+  return tileLines.map((line) => line[0]).join("");
 }
 
 function topEdge(tileLines: string[]) {
@@ -27,20 +31,15 @@ function bottomEdge(tileLines: string[]) {
 }
 
 function edges(tileLines: string[]) {
-  const result = [
-    topEdge(tileLines),
-    leftEdge(tileLines),
-    rightEdge(tileLines),
-    bottomEdge(tileLines)
-  ];
-  return [...result, ...(result.map(edge => edge.split("").reverse().join("")))];
+  const result = [topEdge(tileLines), leftEdge(tileLines), rightEdge(tileLines), bottomEdge(tileLines)];
+  return [...result, ...result.map((edge) => edge.split("").reverse().join(""))];
 }
 
 const edgeToIds: Map<string, number[]> = new Map();
 
 tiles.forEach((tile, id) => {
-  edges(tile).forEach(edge => {
-    const ids = (edgeToIds.get(edge) || []);
+  edges(tile).forEach((edge) => {
+    const ids = edgeToIds.get(edge) || [];
     ids.push(id);
     edgeToIds.set(edge, ids);
   });
@@ -49,8 +48,8 @@ tiles.forEach((tile, id) => {
 const idToNeighbors: Map<number, number[]> = new Map();
 tiles.forEach((tile, id) => {
   const neighborIds = new Set<number>();
-  edges(tile).forEach(edge => {
-    edgeToIds.get(edge)!.forEach(id => neighborIds.add(id));
+  edges(tile).forEach((edge) => {
+    edgeToIds.get(edge)!.forEach((id) => neighborIds.add(id));
   });
   neighborIds.delete(id);
   idToNeighbors.set(id, [...neighborIds]);
@@ -63,7 +62,12 @@ p(cornerIds.reduce((a, b) => a * b));
 function rotate90(lines: string[]): string[] {
   const result: string[] = [];
   for (let i = 0; i < lines[0].length; ++i) {
-    result.push([...lines].reverse().map(line => line[i]).join(""));
+    result.push(
+      [...lines]
+        .reverse()
+        .map((line) => line[i])
+        .join("")
+    );
   }
   return result;
 }
@@ -76,8 +80,7 @@ function allVariants(lines: string[]): string[][] {
   const rot1 = rotate90(lines);
   const rot2 = rotate90(rot1);
   const rot3 = rotate90(rot2);
-  return [lines, rot1, rot2, rot3,
-    flip(lines), flip(rot1), flip(rot2), flip(rot3)];
+  return [lines, rot1, rot2, rot3, flip(lines), flip(rot1), flip(rot2), flip(rot3)];
 }
 
 const idsMap = new Map2D<Set<number>>();
@@ -89,8 +92,8 @@ unusedIds.delete(cornerIds[0]);
 
 function getPotentialNeighbors(ids: number[]): Set<number> {
   const result = new Set<number>();
-  ids.forEach(id => {
-    idToNeighbors.get(id)!.forEach(neighbor => result.add(neighbor));
+  ids.forEach((id) => {
+    idToNeighbors.get(id)!.forEach((neighbor) => result.add(neighbor));
   });
   return result;
 }
@@ -102,7 +105,7 @@ for (let y = 0; y < edgeLength; ++y) {
     if (node.value === undefined) {
       node.value = new Set(unusedIds);
     }
-    node.get4Neighbors().forEach(neighbor => {
+    node.get4Neighbors().forEach((neighbor) => {
       if (neighbor.value !== undefined) {
         node.value = intersection(node.value!, getPotentialNeighbors([...neighbor.value]));
       }
@@ -118,17 +121,16 @@ const topRightNode = idsMap.getNode(edgeLength - 1, 0);
 topRightNode.value = new Set([[...topRightNode.value!][0]]);
 
 for (let i = 0; i < edgeLength * 10; ++i) {
-  idsMap.forEachNode(node => {
+  idsMap.forEachNode((node) => {
     const value = node.value!;
     if (value.size == 1) {
-      value.forEach(id => unusedIds.delete(id));
-    }
-    else {
-      node.get4Neighbors().forEach(neighbor => {
+      value.forEach((id) => unusedIds.delete(id));
+    } else {
+      node.get4Neighbors().forEach((neighbor) => {
         if (neighbor.value !== undefined) {
           node.value = intersection(intersection(value, getPotentialNeighbors([...neighbor.value])), unusedIds);
-          const neighborCount = node.get4Neighbors().filter(neighbor => neighbor.value !== undefined).length;
-          node.value = new Set([...node.value].filter(id => idToNeighbors.get(id)!.length === neighborCount));
+          const neighborCount = node.get4Neighbors().filter((neighbor) => neighbor.value !== undefined).length;
+          node.value = new Set([...node.value].filter((id) => idToNeighbors.get(id)!.length === neighborCount));
         }
       });
     }
@@ -136,12 +138,12 @@ for (let i = 0; i < edgeLength * 10; ++i) {
 }
 
 class IdAndTileVariant {
-  constructor(readonly id: number, public tile?: string[]) { }
+  constructor(readonly id: number, public tile?: string[]) {}
 }
 
 const map = new Map2D<IdAndTileVariant>();
 
-idsMap.forEachNode(node => {
+idsMap.forEachNode((node) => {
   const ids = [...node.value!];
   if (ids.length !== 1) {
     throw "not unique";
@@ -149,14 +151,14 @@ idsMap.forEachNode(node => {
   map.set(node.x, node.y, new IdAndTileVariant(ids[0]));
 });
 
-map.forEachNode(node => {
+map.forEachNode((node) => {
   const current = node.value!;
   if (current.tile === undefined) {
     const left = node.getLeft().value;
     const up = node.getUp().value;
     if (left !== undefined) {
       const variants: string[][] = [];
-      allVariants(tiles.get(current.id)!).forEach(tile => {
+      allVariants(tiles.get(current.id)!).forEach((tile) => {
         if (rightEdge(left.tile!) === leftEdge(tile)) {
           variants.push(tile);
         }
@@ -165,10 +167,9 @@ map.forEachNode(node => {
         throw "no unique variant: " + variants;
       }
       current.tile = variants[0];
-    }
-    else if (up != undefined) {
+    } else if (up != undefined) {
       const variants: string[][] = [];
-      allVariants(tiles.get(current.id)!).forEach(tile => {
+      allVariants(tiles.get(current.id)!).forEach((tile) => {
         if (bottomEdge(up.tile!) === topEdge(tile)) {
           variants.push(tile);
         }
@@ -177,16 +178,15 @@ map.forEachNode(node => {
         throw "no unique variant: " + variants;
       }
       current.tile = variants[0];
-    }
-    else {
+    } else {
       // top left node, init it and its right and down neighbors
       const right = node.getRight().value!;
       const down = node.getDown().value!;
 
-      allVariants(tiles.get(current.id)!).forEach(tile1 => {
-        allVariants(tiles.get(right.id)!).forEach(tile2 => {
+      allVariants(tiles.get(current.id)!).forEach((tile1) => {
+        allVariants(tiles.get(right.id)!).forEach((tile2) => {
           if (rightEdge(tile1) === leftEdge(tile2)) {
-            allVariants(tiles.get(down.id)!).forEach(tile3 => {
+            allVariants(tiles.get(down.id)!).forEach((tile3) => {
               if (bottomEdge(tile1) === topEdge(tile3)) {
                 current.tile = tile1;
                 right.tile = tile2;
@@ -213,11 +213,7 @@ for (let y = 0; y < edgeLength; ++y) {
   }
 }
 
-const monster = [
-  "                  # ",
-  "#    ##    ##    ###",
-  " #  #  #  #  #  #   "
-];
+const monster = ["                  # ", "#    ##    ##    ###", " #  #  #  #  #  #   "];
 
 function removeMonsters(image: string[], monster: string[]): string[] {
   const result = [...image];
@@ -226,7 +222,10 @@ function removeMonsters(image: string[], monster: string[]): string[] {
       let match = true;
       for (let monsterY = 0; monsterY < monster.length; ++monsterY) {
         for (let monsterX = 0; monsterX < monster[0].length; ++monsterX) {
-          if (monster[monsterY][monsterX] === "#" && (image[y + monsterY] === undefined || image[y + monsterY][x + monsterX] !== "#")) {
+          if (
+            monster[monsterY][monsterX] === "#" &&
+            (image[y + monsterY] === undefined || image[y + monsterY][x + monsterX] !== "#")
+          ) {
             match = false;
           }
         }
@@ -247,9 +246,9 @@ function removeMonsters(image: string[], monster: string[]): string[] {
   return result;
 }
 
-allVariants(fullImage).forEach(variant => {
+allVariants(fullImage).forEach((variant) => {
   const withoutMonsters = removeMonsters(variant, monster).join("\n");
   if (withoutMonsters.indexOf("O") >= 0) {
-    p(withoutMonsters.split("").filter(char => char === "#").length);
+    p(withoutMonsters.split("").filter((char) => char === "#").length);
   }
 });

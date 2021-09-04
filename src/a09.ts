@@ -1,6 +1,6 @@
 import { p, readLines, sum } from "./util/util";
 
-const numbers = readLines("input/a09.txt").map(line => parseInt(line));
+const numbers = readLines("input/a09.txt").map((line) => parseInt(line));
 
 function findError(numbers: number[], windowSize: number) {
   outer: for (let index = windowSize; index < numbers.length; ++index) {

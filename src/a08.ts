@@ -5,7 +5,7 @@ const lines = readLines("input/a08.txt");
 class Op {
   execCount = 0;
 
-  constructor(public accumulator: number, public jump: number) { }
+  constructor(public accumulator: number, public jump: number) {}
 }
 
 function parseOps(lines: string[], modIndex?: number): Op[] {
@@ -27,7 +27,7 @@ function parseOps(lines: string[], modIndex?: number): Op[] {
   });
 }
 
-function exec(modIndex?: number): { pc: number, acc: number; } {
+function exec(modIndex?: number): { pc: number; acc: number } {
   const ops = parseOps(lines, modIndex);
   let pc = 0;
   let acc = 0;

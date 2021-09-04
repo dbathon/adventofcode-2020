@@ -3,23 +3,27 @@ import { p, readLines, sum } from "./util/util";
 const lines = readLines("input/a16.txt");
 
 class Field {
-  constructor(readonly name: string, readonly constraints: [number, number][]) { }
+  constructor(readonly name: string, readonly constraints: [number, number][]) {}
 }
 
 const fields: Field[] = [];
 
 const tickets: number[][] = [];
 
-lines.forEach(line => {
+lines.forEach((line) => {
   if (line.indexOf(": ") >= 0) {
     const [name, constraints] = line.split(": ");
-    fields.push(new Field(name, constraints.split(" or ").map(spec => {
-      const [min, max] = spec.split("-");
-      return [parseInt(min), parseInt(max)];
-    })));
-  }
-  else if (line.indexOf(",") >= 0) {
-    tickets.push(line.split(",").map(field => parseInt(field)));
+    fields.push(
+      new Field(
+        name,
+        constraints.split(" or ").map((spec) => {
+          const [min, max] = spec.split("-");
+          return [parseInt(min), parseInt(max)];
+        })
+      )
+    );
+  } else if (line.indexOf(",") >= 0) {
+    tickets.push(line.split(",").map((field) => parseInt(field)));
   }
 });
 
@@ -28,25 +32,26 @@ function isValidForField(field: Field, fieldValue: number): unknown {
 }
 
 function getInvalidFields(ticket: number[]): number[] {
-  return ticket.filter(fieldValue => {
-    return fields.find(field => isValidForField(field, fieldValue)) === undefined;
+  return ticket.filter((fieldValue) => {
+    return fields.find((field) => isValidForField(field, fieldValue)) === undefined;
   });
 }
 
-p(sum(tickets.slice(1).map(ticket => sum(getInvalidFields(ticket)))));
+p(sum(tickets.slice(1).map((ticket) => sum(getInvalidFields(ticket)))));
 
+const potentialFields = tickets[0].map((_) => new Set(fields.map((field) => field.name)));
 
-const potentialFields = tickets[0].map(_ => new Set(fields.map(field => field.name)));
-
-tickets.filter(ticket => getInvalidFields(ticket).length === 0).forEach(ticket => {
-  ticket.forEach((fieldValue, index) => {
-    return fields.forEach(field => {
-      if (!isValidForField(field, fieldValue)) {
-        potentialFields[index].delete(field.name);
-      }
+tickets
+  .filter((ticket) => getInvalidFields(ticket).length === 0)
+  .forEach((ticket) => {
+    ticket.forEach((fieldValue, index) => {
+      return fields.forEach((field) => {
+        if (!isValidForField(field, fieldValue)) {
+          potentialFields[index].delete(field.name);
+        }
+      });
     });
   });
-});
 
 const nameToIndex: Map<string, number> = new Map();
 
@@ -59,7 +64,7 @@ while (true) {
     }
   });
   potentialFields.forEach((set, index) => {
-    [...set].forEach(field => {
+    [...set].forEach((field) => {
       if (nameToIndex.has(field)) {
         set.delete(field);
         progress = true;

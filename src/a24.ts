@@ -18,26 +18,24 @@ function go(node: Map2DNode<boolean>, directions: string): Map2DNode<boolean> {
     node = DIRECTIONS.get(direction)!(node);
     if (direction === "n" || direction === "s") {
       node = DIRECTIONS.get(directions[++i])!(node);
-    }
-    else {
+    } else {
       node = DIRECTIONS.get(direction)!(node);
     }
   }
   return node;
 }
 
-lines.forEach(line => {
+lines.forEach((line) => {
   const target = go(map.getNode(0, 0), line);
   if (target.value) {
     target.value = false;
-  }
-  else {
+  } else {
     target.value = true;
   }
 });
 
 function countBlack(): any {
-  return sum(map.getAsArray().map(row => sum(row.map(tile => tile ? 1 : 0))));
+  return sum(map.getAsArray().map((row) => sum(row.map((tile) => (tile ? 1 : 0)))));
 }
 
 p(countBlack());
@@ -47,10 +45,10 @@ const neighborDirections = ["e", "se", "sw", "w", "nw", "ne"];
 function nextDay() {
   const previousMap = map.copy();
   const relevantTiles = new Map<string, Map2DNode<boolean>>();
-  map.forEachNode(node => {
+  map.forEachNode((node) => {
     if (node.value) {
       relevantTiles.set(node.x + "," + node.y, node);
-      neighborDirections.forEach(direction => {
+      neighborDirections.forEach((direction) => {
         const neighbor = go(node, direction);
         relevantTiles.set(neighbor.x + "," + neighbor.y, neighbor);
       });
@@ -59,7 +57,7 @@ function nextDay() {
   for (const node of relevantTiles.values()) {
     let previousBlackNeighborCount = 0;
     const previousNode = previousMap.getNode(node.x, node.y);
-    neighborDirections.forEach(direction => {
+    neighborDirections.forEach((direction) => {
       if (go(previousNode, direction).value) {
         ++previousBlackNeighborCount;
       }
