@@ -31,6 +31,7 @@
     "a24": "node -r esbuild-register src/a24.ts",
     "a25": "node -r esbuild-register src/a25.ts",
     "all": "node -r esbuild-register src/runAll.ts",
+    "pumuckl": "node -r esbuild-register src/extra/pumuckl.ts",
     "check": "tsc --noEmit",
     "prettier": "prettier --write ."
   },
